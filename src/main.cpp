@@ -1,12 +1,15 @@
 #include <bits/stdc++.h>
-
+#include <stdlib.h>
+#include "utils.hpp"
 using namespace std;
+
+ // g++ -std=c++17 src/main.cpp src/utils.cpp  -Iinclude -o stash
 
 class inventoryManager
 {
 
     private:
-    struct component
+    struct components
     {
        int ID;
        string name;
@@ -15,15 +18,9 @@ class inventoryManager
        string detials;
        
     };
-    vector<component> inventory;
-
-    struct table
-    {
-        /* data */
-    };
+    vector<components> inventory;
     
-    
-    vector<component> DummyData()
+    vector<components> DummyData()
     {
          return {
         {1, "HC-SR04", "Ultrasonic Sensor", 5, "Used for distance measurement"},
@@ -44,19 +41,24 @@ class inventoryManager
         };
     }
 
+    // selected option
+    int option = 0;
+    int curid = 15;
+
     public:
     inventoryManager()
     {
-        std::cout << "\033[2J\033[1;1H";  // ANSI escape code
+        typeOut(prntRed("Loading PLease Wait ................"), 50);
+        // std::cout << "\033[2J\033[1;1H";  // ANSI escape code
         cout<<"initialization";
         inventory = DummyData();
-        cout<<"Sucessfully Added Dummy Data"<<endl;
-        getList(inventory);
+        cout<<" /n Sucessfully Added Dummy Data"<<endl;
+        // getList(inventory);
 
     }
 
 
-    void getList(const vector<component>& inventory)
+    void getComponentList()
     {
         cout << string(110, '-');
 
@@ -69,7 +71,6 @@ class inventoryManager
          << setw(38)<< "Details "<<"|";
 
         cout << "\n"<<string(110, '-') << "\n";
-
 
         for(const auto& item : inventory)
         {
@@ -84,18 +85,103 @@ class inventoryManager
     
     }
 
-    void addItem(int id, string name, string type, int qty, string details)
+    void addComponent()
     {
-        component newitem = {id, name, type, qty, details};
-        inventory.push_back(newitem);
-        cout<<"new Item added : " << name <<endl;
+        components newitem;
+
+        cout<<prntGreen("Enter New Component Details")<<endl;
+        cout<<prntRed("Current Component ID : ")<<curid+1<<endl;
+
+        newitem.ID = curid + 1;
+
+        cin.ignore();
+        cout<<"Name : ";
+        getline(cin,newitem.name);
+
+
+        cout<<"Type : ";
+        getline(cin,newitem.type);
+
+
+        cout<<"Quantity : ";
+        while(!(cin >> newitem.quantity))
+        {
+            cout<<prntRed("Error invalid input retry");
+            cin.clear(); cin.ignore(1000,'\n');
+        }
+
+        cin.ignore();
+        cout<< "Details : ";
+        getline(cin,newitem.detials);
+        
+         cin.ignore();
+            cout << "Details: ";
+            getline(cin, newitem.detials);
+
+            cout << "\n✅ Confirming Entry:\n";
+            cout << "----------------------\n";
+            cout << "ID: " << newitem.ID << "\n";
+            cout << "Name: " << newitem.name << "\n";
+            cout << "Type: " << newitem.type << "\n";
+            cout << "Quantity: " << newitem.quantity << "\n";
+            cout << "Details: " << newitem.detials << "\n";
+
+            char confirm;
+            cout << "Add this component to inventory? (y/n): ";
+            cin >> confirm;
+
+            if (tolower(confirm) == 'y') {
+                inventory.push_back(newitem);
+                cout << "✅ Component added successfully!\n";
+            } else {
+                cout << "❌ Component discarded.\n";
+            }
+
+        getComponentList();
     }
+
+    int  displayMenu() {
+    cout << "\n========= 📦 STASH: Inventory CLI =========\n";
+    cout << "1. 📋  Show All Components\n";
+    cout << "2. ➕  Add New Component\n";
+    cout << "3. 🔍  Search Component by Name\n";
+    cout << "4. ❌  Delete Component by ID\n";
+    cout << "5. 💾  Save Inventory to File\n";
+    cout << "6. 📂  Load Inventory from File\n";
+    cout << "7. 🚪  Exit\n";
+    cout << "===========================================\n";
+    cout << "Enter your choice: ";
+    
+    cin>>option;
+        return option;
+    }
+
+    
+
 
 };
 
 
 int main()
 {
+    int choise = 0;
     inventoryManager obj;
+    
+do
+{
+    choise = obj.displayMenu();
+
+    switch (choise)
+    {
+    case 1: clrscr();  obj.getComponentList(); break;
+    case 2: clrscr();  obj.addComponent(); break;
+    case 7: clrscr();  typeOut(prntRed("Quiting ..............."), 50); break;
+    default:
+    break;
+    }
+
+}
+while(choise!=7);    
+    
     return 0;
 }
